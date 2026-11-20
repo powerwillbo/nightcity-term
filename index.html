@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080d12">
+<meta name="description" content="NIGHTCITY TERMINAL — mobile Linux and cybersecurity training lab">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>NIGHTCITY TERMINAL</title>
+<style>
+:root{--bg:#070c10;--panel:#101a20;--panel2:#14232a;--green:#54f0a2;--muted:#b1c2bb;--dim:#789188;--orange:#ff9b50;--red:#ff8585;--line:#244236}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--muted);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;min-height:100vh}
+header{position:sticky;top:0;z-index:5;background:#0b1217ee;backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:14px 15px}
+.brand{color:var(--green);font-size:18px;font-weight:900;letter-spacing:1px;text-shadow:0 0 12px #54f0a255}.sub{font-size:10px;color:var(--dim);margin-top:4px}
+nav{display:flex;gap:7px;overflow:auto;padding:10px 12px;background:#0a1116;border-bottom:1px solid var(--line);position:sticky;top:58px;z-index:4}
+nav button{white-space:nowrap;padding:9px 11px;background:#14231d;border:1px solid var(--line);color:var(--muted);border-radius:9px;font:12px inherit}
+nav button.active{color:var(--green);border-color:var(--green)}
+main{max-width:900px;margin:auto;padding:13px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:13px;margin-bottom:12px}
+h2{font-size:16px;color:var(--green);margin:0 0 10px}h3{font-size:14px;color:var(--orange);margin:0 0 8px}
+p{line-height:1.5}.muted{color:var(--dim);font-size:11px;line-height:1.5}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{background:#0b1419;border:1px solid var(--line);padding:10px;border-radius:10px}.stat b{display:block;color:var(--green);font-size:20px}.stat span{font-size:10px;color:var(--dim)}
+#terminal{background:#030709;border:1px solid #1d3b2e;border-radius:12px;padding:12px;height:43vh;min-height:260px;max-height:520px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;line-height:1.55}
+.line{margin:0 0 4px}.prompt{color:var(--green)}.out{color:var(--muted)}.err{color:var(--red)}.good{color:var(--green)}
+.inputbar{display:flex;align-items:center;gap:7px;margin-top:9px;background:#101a20;border:1px solid var(--line);padding:9px;border-radius:11px}.inputbar label{font-size:11px;color:var(--green);white-space:nowrap}
+input{min-width:0;flex:1;background:transparent;border:0;outline:0;color:white;font:16px ui-monospace,monospace}
+button{cursor:pointer;font-family:inherit}.run,.action{background:#174b35;color:var(--green);border:1px solid #2c8058;border-radius:9px;padding:10px 12px;font-weight:700}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}.action{background:#14231d;font-size:12px}.action.secondary{color:var(--orange);border-color:#74431f;background:#26190f}
+.mission-list{display:grid;gap:8px}.mission{padding:11px;border:1px solid var(--line);border-radius:10px;background:#0c151a}.mission strong{color:var(--green);font-size:12px}.mission p{font-size:12px;margin:5px 0}.mission small{color:var(--dim)}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#070d11;padding:10px;border-radius:8px;color:var(--green);font-size:12px}
+.hidden{display:none!important}.tag{font-size:10px;color:var(--orange);border:1px solid #70421f;border-radius:20px;padding:3px 7px}
+.progress{height:7px;background:#1c2b2e;border-radius:9px;overflow:hidden;margin-top:8px}.progress>i{display:block;height:100%;background:var(--green);width:0}
+footer{padding:20px 15px 35px;text-align:center;color:var(--dim);font-size:10px}
+@media(min-width:700px){main{padding:22px}#terminal{height:430px;font-size:14px}}
+</style>
+</head>
+<body>
+<header><div class="brand">▣ NIGHTCITY TERMINAL</div><div class="sub">MOBILE LINUX LAB · SIMULATED SHELL · BUILD 0.5</div></header>
+<nav>
+<button class="active" data-tab="terminalTab">Terminal</button>
+<button data-tab="missionsTab">Missions</button>
+<button data-tab="progressTab">Fortschritt</button>
+<button data-tab="manualTab">Befehle</button>
+</nav>
+<main>
+<section id="terminalTab">
+<div class="panel">
+ <div class="stats">
+  <div class="stat"><b id="level">01</b><span>LEVEL</span></div>
+  <div class="stat"><b id="xp">0</b><span>XP</span></div>
+  <div class="stat"><b id="done">0/8</b><span>MISSIONS</span></div>
+ </div>
+ <div class="progress"><i id="xpbar"></i></div>
+</div>
+<div class="panel">
+ <h2 id="missionTitle">MISSION 001 — LOG SCAN</h2>
+ <p id="missionText">Finde heraus, welche Logdateien das Wort failed enthalten.</p>
+ <div class="muted" id="missionGoal">Ziel: gib die Dateinamen der Treffer aus.</div>
+</div>
+<div id="terminal" aria-live="polite"></div>
+<form class="inputbar" id="form"><label id="prompt">william@nightcity:~$</label><input id="cmd" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="send" aria-label="Terminalbefehl"><button class="run" type="submit">Run</button></form>
+<div class="actions"><button class="action" id="hint">Hint</button><button class="action" id="resetLab">Reset Lab</button><button class="action secondary" id="clear">Clear</button></div>
+<p class="muted">Simulation: Befehle laufen ausschließlich im virtuellen Übungs-Dateisystem. Keine echten iPhone-Dateien oder Systemprozesse werden verändert.</p>
+</section>
+<section id="missionsTab" class="hidden">
+<div class="panel"><h2>CYBERDECK — MISSIONS</h2><p class="muted">Eine Aufgabe nach der anderen. Schließe eine Mission ab, um XP zu erhalten.</p><div id="missionList" class="mission-list"></div></div>
+</section>
+<section id="progressTab" class="hidden">
+<div class="panel"><h2>OPERATOR PROFILE</h2><div class="stats"><div class="stat"><b id="pLevel">01</b><span>LEVEL</span></div><div class="stat"><b id="pXp">0</b><span>GESAMT XP</span></div><div class="stat"><b id="pDone">0</b><span>ABSCHLÜSSE</span></div></div><p id="rankText" class="muted">Rang: Rookie</p><h3>Abgeschlossene Missionen</h3><div id="completedList" class="muted">Noch keine Mission abgeschlossen.</div></div>
+</section>
+<section id="manualTab" class="hidden">
+<div class="panel"><h2>COMMAND DATABASE</h2>
+<h3>Dateisystem</h3><pre>pwd              aktuelles Verzeichnis
+ls [-la] [pfad]  Dateien anzeigen
+cd [pfad]        Verzeichnis wechseln
+cat DATEI        Dateiinhalt anzeigen
+find PFAD ...    Dateien suchen
+touch DATEI      Datei erstellen
+mkdir ORDNER     Ordner erstellen</pre>
+<h3>Text & Analyse</h3><pre>grep [-l|-r] MUSTER DATEI
+sort DATEI
+uniq DATEI
+cut -d ':' -f 1 DATEI
+Befehl1 | Befehl2</pre>
+<h3>Shell-Grundlagen (Lernsimulation)</h3><pre>echo TEXT
+export NAME=WERT
+printenv
+whoami
+ps
+env
+help
+clear</pre>
+<p class="muted">Diese Lern-Shell implementiert ausgewählte Befehle und Beispiele. Sie ist kein vollständiger Bash-Interpreter und kein echtes Ubuntu.</p>
+</div>
+</section>
+</main>
+<footer>NIGHTCITY TERMINAL · TRAIN SMART · STAY IN THE LAB</footer>
+<script>
+const $=id=>document.getElementById(id);
+const initialFiles={
+'/home/william/lab/auth.log':'LOGIN success\nLOGIN failed\n',
+'/home/william/lab/system.log':'SYSTEM started\nBackup completed\n',
+'/home/william/lab/network.log':'Connection failed\nTimeout detected\n',
+'/home/william/lab/notes.txt':'Nothing suspicious here\n',
+'/home/william/lab/users.txt':'william:1000:/bin/bash\nroot:0:/bin/bash\nguest:1001:/bin/sh\n',
+'/home/william/lab/access.log':'192.0.2.10 GET / 200\n203.0.113.7 POST /login 401\n198.51.100.4 GET /admin 403\n203.0.113.9 POST /login 401\n',
+'/home/william/lab/permissions.txt':'-rw-r--r-- notes.txt\n-rwxrwxrwx writable.sh\n-rw------- secret.txt\n'
+};
+let files={...initialFiles},dirs=new Set(['/','/home','/home/william','/home/william/lab']),cwd='/home/william',env={HOME:'/home/william',USER:'william',SHELL:'/bin/bash',PATH:'/usr/bin:/bin'},xp=0,completed=[],current=0,history=[],histIndex=0;
+const missions=[
+['001 — LOG SCAN','Finde mit grep alle Logdateien, die „failed“ enthalten. Gib nur die Dateinamen aus.','Tipp: grep -l "failed" *.log','grep -l failed auth.log network.log',100],
+['002 — USER EXTRACTION','Gib aus users.txt ausschließlich die Benutzernamen aus. Verwende cut mit : als Trennzeichen.','Tipp: -d setzt das Trennzeichen, -f wählt das Feld.','william\nroot\nguest',100],
+['003 — SORT & UNIQUE','Sortiere die Namen in names.txt alphabetisch und entferne doppelte Einträge.','Tipp: cat names.txt | sort | uniq','alpha\nbeta\ngamma',120],
+['004 — AWK LOGIN AUDIT','Finde in access.log die IP-Adressen, deren Statuscode 401 oder 403 ist. Nutze awk.','Tipp: Statuscode ist Feld 4.','203.0.113.7\n198.51.100.4\n203.0.113.9',150],
+['005 — ENVIRONMENT','Setze eine Variable TARGET auf „nightcity“ und gib sie wieder aus.','Tipp: export TARGET=nightcity; echo $TARGET','nightcity',120],
+['006 — PROCESS CHECK','Zeige die simulierte Prozessliste mit ps an und finde den Prozess mit dem Namen sshd.','Tipp: ps | grep sshd','sshd',150],
+['007 — PERMISSION AUDIT','Finde in permissions.txt die Datei mit allen Rechten für Besitzer, Gruppe und andere.','Tipp: Suche nach rwxrwxrwx.','writable.sh',150],
+['008 — MINI SCRIPT','Führe die Lernsequenz aus: setze CHECK=failed und gib danach den Wert mit echo aus.','Tipp: export CHECK=failed, danach echo $CHECK.','failed',180]
+];
+function norm(p){if(!p||p==='~')return '/home/william';if(p.startsWith('~/'))p='/home/william/'+p.slice(2);if(!p.startsWith('/'))p=cwd+'/'+p;let a=[];for(let x of p.split('/')){if(!x||x==='.')continue;if(x==='..')a.pop();else a.push(x)}return '/'+a.join('/')}
+function base(p){return p.split('/').pop()}
+function write(t,cls='out'){let d=document.createElement('div');d.className='line '+cls;d.textContent=t;$('terminal').appendChild(d);$('terminal').scrollTop=$('terminal').scrollHeight}
+function prompt(){let p=cwd==='/home/william'?'~':cwd.replace('/home/william','~');$('prompt').textContent=`william@nightcity:${p}$`}
+function children(p){let n=[];for(let d of dirs)if(d!==p&&norm(d+'/..')===p)n.push(base(d)+'/');for(let f of Object.keys(files))if(norm(f+'/..')===p)n.push(base(f));return [...new Set(n)].sort()}
+function tokens(s){return (s.match(/"(?:[^"\\]|\\.)*"|'[^']*'|[^\s]+/g)||[]).map(x=>x.replace(/^["']|["']$/g,''))}
+function getFile(p){p=norm(p);if(!(p in files))throw `Datei nicht gefunden: ${p}`;return files[p]}
+function simple(raw,pipeIn=null){
+ let t=tokens(raw),c=t[0],a=t.slice(1);if(!c)return '';
+ if(c==='help')return 'Befehle: pwd ls cd cat touch mkdir echo grep find sort uniq cut awk export printenv env whoami ps clear\nPipes: cat datei | sort | uniq';
+ if(c==='pwd')return cwd;if(c==='whoami')return 'william';if(c==='clear'){$('terminal').innerHTML='';return ''}
+ if(c==='ls'){let p=norm(a.find(x=>!x.startsWith('-'))||'.');if(!dirs.has(p))throw 'ls: kein Verzeichnis';return children(p).join('  ')}
+ if(c==='cd'){let p=norm(a[0]||'~');if(!dirs.has(p))throw 'cd: Verzeichnis nicht gefunden';cwd=p;prompt();return ''}
+ if(c==='cat')return a.map(getFile).join('\n');
+ if(c==='touch'){let p=norm(a[0]);if(!a[0])throw 'touch: Dateiname fehlt';files[p]??='';return ''}
+ if(c==='mkdir'){let p=norm(a[0]);if(!a[0])throw 'mkdir: Ordnername fehlt';dirs.add(p);return ''}
+ if(c==='echo')return a.join(' ').replace(/\$([A-Za-z_]\w*)/g,(_,k)=>env[k]||'');
+ if(c==='export'){let m=(a.join(' ').match(/^([A-Za-z_]\w*)=(.*)$/));if(!m)throw 'Syntax: export NAME=WERT';env[m[1]]=m[2].replace(/^["']|["']$/g,'');return ''}
+ if(c==='printenv'||c==='env')return Object.entries(env).map(([k,v])=>k+'='+v).join('\n');
+ if(c==='ps')return 'PID TTY          TIME CMD\n  1 ?        00:00:01 init\n 42 pts/0    00:00:00 bash\n108 ?        00:00:00 sshd\n221 pts/0    00:00:00 ps';
+ if(c==='grep'){let opts=a.filter(x=>x.startsWith('-')),r=a.filter(x=>!x.startsWith('-'));let pattern=r.shift();if(!pattern)throw 'grep: Suchmuster fehlt';let targets=r.length?r:[''];let out=[];for(let f of targets){let content=f?getFile(f):String(pipeIn??'');let hits=content.split('\n').filter(x=>x.includes(pattern));if(hits.length)out.push(opts.includes('-l')?base(norm(f)):hits.map(x=>targets.length>1?base(norm(f))+':'+x:x).join('\n'))}return out.join('\n')}
+ if(c==='find'){let start=norm(a[0]&&!a[0].startsWith('-')?a.shift():'.'),name=null,type=null;for(let i=0;i<a.length;i++){if(a[i]==='-name')name=a[++i];if(a[i]==='-type')type=a[++i]}let all=[...dirs,...Object.keys(files)].filter(p=>p===start||p.startsWith(start.replace(/\/$/,'')+'/'));all=all.filter(p=>type==='f'?p in files:type==='d'?dirs.has(p):true);if(name){let re=new RegExp('^'+name.replace(/\./g,'\\.').replace(/\*/g,'.*')+'$');all=all.filter(p=>re.test(base(p)))}return all.map(p=>p.replace('/home/william','~')).join('\n')}
+ if(c==='sort'||c==='uniq'||c==='cut'||c==='awk'){let text=pipeIn;if(text===null){if(!a.length)throw c+': Eingabe fehlt';text=getFile(a.pop())}let lines=String(text).split('\n');if(c==='sort')return lines.sort().join('\n');if(c==='uniq'){let prev;return lines.filter(x=>{if(x===prev)return false;prev=x;return true}).join('\n')}if(c==='cut'){let d=':',f=1;for(let i=0;i<a.length;i++){if(a[i]==='-d')d=a[++i];else if(a[i]==='-f')f=Number(a[++i]);else if(a[i].startsWith('-f'))f=Number(a[i].slice(2))}return lines.map(x=>x.split(d)[f-1]??'').join('\n')}if(c==='awk'){let status=a.includes('$4==401')||a.includes('$4==403');if(status)return lines.filter(x=>['401','403'].includes(x.trim().split(/\s+/)[3])).map(x=>x.trim().split(/\s+/)[0]).join('\n');throw 'Lern-AWK: Unterstütztes Muster: awk \'$4==401 || $4==403 {print $1}\''}}
+ throw `bash: ${c}: Befehl nicht gefunden`;
+}
+function execute(command){write($('prompt').textContent+' '+command,'prompt');try{let parts=command.split('|').map(x=>x.trim()),result=simple(parts.shift());for(let p of parts)result=simple(p,result);if(result!=='')write(result)}catch(e){write(String(e),'err')}checkMission(command)}
+function checkMission(command){let m=missions[current];if(!m)return;let c=command.trim(),ok=false;
+ if(current===0)ok=/grep\s+-l\s+.*failed/i.test(c);
+ if(current===1)ok=/cut/.test(c)&&/-d/.test(c)&&/-f\s*1/.test(c);
+ if(current===2)ok=/sort/.test(c)&&/uniq/.test(c);
+ if(current===3)ok=/awk/.test(c)&&/401/.test(c)&&/403/.test(c);
+ if(current===4)ok=/export\s+TARGET=nightcity/.test(c)||/echo\s+\$TARGET/.test(c);
+ if(current===5)ok=/ps/.test(c)&&(/grep\s+sshd/.test(c)||c==='ps');
+ if(current===6)ok=/writable\.sh/.test(c)||(/grep/.test(c)&&/rwxrwxrwx/.test(c));
+ if(current===7)ok=/export\s+CHECK=failed/.test(c)||/echo\s+\$CHECK/.test(c);
+ if(ok&&!completed.includes(current)){completed.push(current);xp+=m[4];write(`MISSION COMPLETE · +${m[4]} XP`,'good');updateStats();renderMissions();renderProgress()}
+}
+function updateStats(){let level=1+Math.floor(xp/300);$('level').textContent=String(level).padStart(2,'0');$('xp').textContent=xp;$('done').textContent=completed.length+'/8';$('xpbar').style.width=(xp%300/3)+'%';$('pLevel').textContent=String(level).padStart(2,'0');$('pXp').textContent=xp;$('pDone').textContent=completed.length}
+function selectMission(i){current=i;$('missionTitle').textContent='MISSION '+missions[i][0];$('missionText').textContent=missions[i][1];$('missionGoal').textContent='Ziel: '+missions[i][2];showTab('terminalTab');write('MISSION LOADED: '+missions[i][0],'good')}
+function renderMissions(){$('missionList').innerHTML='';missions.forEach((m,i)=>{let d=document.createElement('div');d.className='mission';let b=document.createElement('button');b.className='action';b.textContent=completed.includes(i)?'Abgeschlossen · '+m[4]+' XP':'Mission starten';b.onclick=()=>selectMission(i);d.innerHTML=`<strong>${m[0]}</strong><p>${m[1]}</p><small>Belohnung: ${m[4]} XP</small>`;d.appendChild(b);$('missionList').appendChild(d)})}
+function renderProgress(){$('completedList').textContent=completed.length?completed.map(i=>missions[i][0]).join(' · '):'Noch keine Mission abgeschlossen.';$('rankText').textContent='Rang: '+(xp>=700?'Netrunner':xp>=300?'Operator':'Rookie')}
+function showTab(id){document.querySelectorAll('main>section').forEach(s=>s.classList.toggle('hidden',s.id!==id));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===id))}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
+$('form').addEventListener('submit',e=>{e.preventDefault();let v=$('cmd').value;$('cmd').value='';if(v.trim()){history.push(v);histIndex=history.length;execute(v)}});
+$('cmd').addEventListener('keydown',e=>{if(e.key==='ArrowUp'){e.preventDefault();histIndex=Math.max(0,histIndex-1);$('cmd').value=history[histIndex]||''}if(e.key==='ArrowDown'){e.preventDefault();histIndex=Math.min(history.length,histIndex+1);$('cmd').value=history[histIndex]||''}});
+$('hint').onclick=()=>write('HINT: '+missions[current][2],'out');
+$('clear').onclick=()=>$('terminal').innerHTML='';
+$('resetLab').onclick=()=>{files={...initialFiles};cwd='/home/william';env={HOME:'/home/william',USER:'william',SHELL:'/bin/bash',PATH:'/usr/bin:/bin'};prompt();$('terminal').innerHTML='';write('Lab zurückgesetzt.','good')};
+updateStats();renderMissions();renderProgress();prompt();write('NIGHTCITY OS v0.5 — SIMULATED SHELL','prompt');write('Welcome, operator. Type help to list commands.','out');write('Mission 001: wechsle nach ~/lab und untersuche die Logs.','out');
+</script>
+<script>
+if("serviceWorker" in navigator && location.protocol.startsWith("http"))addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+</script>
+</body></html>
